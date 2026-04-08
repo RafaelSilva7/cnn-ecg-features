@@ -65,7 +65,6 @@ class ECGClassifier(nn.Module):
         self.n_classes = n_classes
 
         self.feature_extractor = FeatureExtractor(
-            
             kernels=[7, 5, 5, 5, 5, 3, 3, 3],
             out_channels=[16, 16, 32, 32, 64, 64, 64, 64], 
             max_poolings=[2, 4, 2, 4, 2, 2, 2, 2]
@@ -89,6 +88,7 @@ class ECGClassifier(nn.Module):
 
             nn.Linear(64, self.n_classes) 
         )
+        self.classifier.to(x.device)
 
     def forward(self, x):
         self._feat = self.feature_extractor(x)
