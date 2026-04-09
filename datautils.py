@@ -27,13 +27,9 @@ class NPZDataset(Dataset):
 
 
 
-def get_dataloaders(train_path, val_path, batch_size=32, num_workers=4, pin_memory=True):
-    train_dataset = NPZDataset(train_path)
-    print("Train dataset loaded with {} samples.".format(len(train_dataset)))
+def get_dataloaders(dataset_dir, batch_size=32, num_workers=4, pin_memory=True):
 
-    val_dataset = NPZDataset(val_path)
-    print("Validation dataset loaded with {} samples.".format(len(train_dataset)))
-
+    train_dataset = NPZDataset(dataset_dir / "train.npz")
     train_loader = DataLoader(
         train_dataset,
         batch_size,
@@ -41,7 +37,9 @@ def get_dataloaders(train_path, val_path, batch_size=32, num_workers=4, pin_memo
         num_workers=num_workers,
         pin_memory=pin_memory
     )
+    print("Train dataset loaded with {} samples.".format(len(train_dataset)))
 
+    val_dataset = NPZDataset(dataset_dir / "val.npz")
     val_loader = DataLoader(
         val_dataset,
         batch_size,
@@ -49,5 +47,16 @@ def get_dataloaders(train_path, val_path, batch_size=32, num_workers=4, pin_memo
         num_workers=num_workers,
         pin_memory=pin_memory
     )
+    print("Validation dataset loaded with {} samples.".format(len(train_dataset)))
 
-    return train_loader, val_loader
+    test_dataset = NPZDataset(dataset_dir / "test.npz")
+    test_loader = DataLoader(
+        test_dataset,
+        batch_size,
+        shuffle=False,
+        num_workers=num_workers,
+        pin_memory=pin_memory
+    )
+    print("Test dataset loaded with {} samples.".format(len(train_dataset)))
+
+    return train_loader, val_loader, test_loader
