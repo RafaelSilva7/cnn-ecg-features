@@ -10,13 +10,17 @@ class NPZDataset(Dataset):
         self.X = data[x_key]
         self.y = data[y_key]
 
+        if self.y.ndim == 2 and self.y.shape[1] == 1:
+            self.y = self.y.squeeze(1)  # Convert shape (N, 1) to (N,)
+            print(f"\n!Warning: Labels had shape {data[y_key].shape}, squeezed to {self.y.shape}.")
+
         self.dtype = dtype
 
     def __len__(self):
-        return len(self.X)
+        return self.X.shape[0]
 
     def __getitem__(self, idx):
-        x = torch.tensor(self.X[idx], dtype=self.dtype)
+        x = torch.from_numpy(self.X[idx]).to(self.dtype)
         y = torch.tensor(self.y[idx])
 
         return x, y

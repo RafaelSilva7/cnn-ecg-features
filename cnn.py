@@ -62,6 +62,7 @@ class ECGClassifier(nn.Module):
             'multilabel' → BCEWithLogitsLoss
         """
         super().__init__()
+        self.task = task  # just for reference, not used in the model definition
         self.n_classes = n_classes
 
         self.feature_extractor = FeatureExtractor(
@@ -129,6 +130,8 @@ class ECGRegressor(nn.Module):
 
             nn.Linear(64, 1)
         )
+
+        self.regressor.to(x.device)
 
     def forward(self, x):
         self._feat = self.feature_extractor(x)
