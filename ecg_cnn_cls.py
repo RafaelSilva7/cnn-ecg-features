@@ -8,7 +8,7 @@ import pandas as pd
 
 from sklearn.metrics import classification_report, confusion_matrix, roc_auc_score
 
-from cnn import ECGClassifier
+from models.cnn import ECGClassifier
 from datautils import get_dataloaders
 from utils import set_seed, timestamp, MetricsLogger, classification_metrics
 
@@ -169,7 +169,7 @@ def evaluate_model(test_loader, model, device, save_dir: Path):
     with open(save_dir / "classification_report.txt", "w") as f:
         f.write(report)
     
-    np.savez_compressed(save_dir / "test_probs.npz", logits=all_logits.numpy(), probs=all_probs.numpy())
+    np.savez_compressed(save_dir / "test_logits.npz", logits=all_logits.numpy(), probs=all_probs.numpy())
 
 
 def get_args():
