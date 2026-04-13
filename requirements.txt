@@ -4,4 +4,3 @@ numpy==2.2.6
 wfdb==4.3.1
 tqdm==4.67.3
 scikit_learn==1.7.2
-huggingface_hub==1.10.1

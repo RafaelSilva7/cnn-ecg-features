@@ -5,6 +5,7 @@ from datetime import datetime
 import csv
 from pathlib import Path
 from sklearn.metrics import precision_score, recall_score, f1_score
+from scipy.signal import medfilt, iirnotch, filtfilt, butter, resample
 
 
 def timestamp():
@@ -85,3 +86,37 @@ def classification_metrics(preds, targets):
         "recall_weighted": recall_score(targets, preds, average="weighted"),
         "f1_weighted": f1_score(targets, preds, average="weighted"),
     }
+
+
+def filter_bandpass(signal, fs):
+    """
+    Bandpass filter
+
+    Args:
+        signal: 2D numpy array of shape (channels, time)
+        fs: sampling frequency
+
+    Return:
+    - filtered_signal: 2D numpy array of shape (channels, time)
+    """
+    # Remove power-line interference
+    b, a = iirnotch(50, 30, fs)
+    filtered_signal = np.zeros_like(signal)
+    for c in range(signal.shape[0]):
+        filtered_signal[c] = filtfilt(b, a, signal[c])
+
+    # Simple bandpass filter
+    b, a = butter(N=4, Wn=[0.67, 40], btype='bandpass', fs=fs)
+    for c in range(signal.shape[0]):
+        filtered_signal[c] = filtfilt(b, a, filtered_signal[c])
+
+    # Remove baseline wander
+    baseline = np.zeros_like(filtered_signal)
+    for c in range(filtered_signal.shape[0]):
+        kernel_size = int(0.4 * fs) + 1
+        if kernel_size % 2 == 0:
+            kernel_size += 1  # Ensure kernel size is odd
+        baseline[c] = medfilt(filtered_signal[c], kernel_size=kernel_size)
+    filter_ecg = filtered_signal - baseline
+
+    return filter_ecg
