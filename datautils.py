@@ -1,7 +1,7 @@
 import h5py
 import torch
 import numpy as np
-from torch.utils.data import Dataset, DataLoader
+from torch.utils.data import Dataset, DataLoader, ConcatDataset
 from utils import filter_bandpass
 
 
@@ -82,6 +82,29 @@ class HDF5LazyDataset(Dataset):
     def __del__(self):
         if self._file is not None:
             self._file.close()
+
+
+def create_dataloader(
+    *paths,
+    task,
+    batch_size=32,
+    num_workers=4,
+    pin_memory=True,
+    shuffle=False,
+    transform=None
+):
+    # read and concatenate datasets    
+    dataset = ConcatDataset([HDF5LazyDataset(p, task, transform) for p in paths])
+
+    dataloader = DataLoader(
+        dataset,
+        batch_size=batch_size,
+        shuffle=shuffle,
+        num_workers=num_workers,
+        pin_memory=pin_memory,
+    )
+
+    return dataloader
 
 
 def create_dataloaders(
